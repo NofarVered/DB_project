@@ -1,0 +1,5 @@
+# /DOCUMENTATION
+# ▪ /NAMES-AND-IDS.txt (group members details)
+# ▪ /USER-MANUAL.pdf (see “documentation” section)
+# ▪ /SOFTWARE-DOCS.pdf (see “documentation” section)
+# ▪ /MYSQL-USER-AND-PASSWORD.txt (the MySQL user you were assigned)
