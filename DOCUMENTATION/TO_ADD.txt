@@ -3,3 +3,24 @@
 # ▪ /USER-MANUAL.pdf (see “documentation” section)
 # ▪ /SOFTWARE-DOCS.pdf (see “documentation” section)
 # ▪ /MYSQL-USER-AND-PASSWORD.txt (the MySQL user you were assigned)
+
+- שני API שקשורים לסרטים
+
+-  הדאטה בייס צריך להכיל לפחות 10k רשמות ולפחות 5 טבלאות.
+
+- לפחות 7  SELECT queries : 
+6 מורכבות (nested queries, group by, aggregations, EXISTS, etc.)
+1 פול-טקסט 
+
+- היצירה של הDB עצמו היא בפייתון או SQL
+-העדכון שלה צריך להיות בפייתון
+- sql queries צריכות להיות בפייתון 
+
+DB design:
+- שימוש באינדקסים עבור אופטימיזציה
+- מפתחות זרים ופריימרי
+
+
+The MySQL server should be “mysqlsrv1.cs.tau.ac.il”
+
+DbMysql36
