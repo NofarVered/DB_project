@@ -1,3 +1,6 @@
+-- I want to know what is the total profit of all the movies X-actor played on
+            
+            
             -- select m.movie_id,
             --     m.title,
             --     count(distinct a.id) as amount_relevant_actors,

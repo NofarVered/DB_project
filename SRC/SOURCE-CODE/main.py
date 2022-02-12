@@ -28,22 +28,32 @@ while (True):
 
     if navigate == '1':
         pt = input("\nWhich actor?")
+        if pt is None:
+            raise ValueError("Must be provided!")
         # TO DO
         break
     elif navigate == '2':
         pt = input("\nWhich genere?")
+        if pt is None:
+            raise ValueError("Must be provided!")
         # TO DO
         break
     elif navigate == '3':
         pt = input("\nWhich gender?")
+        if pt is None:
+            raise ValueError("Must be provided!")
         # TO DO
         break
     elif navigate == '4':
         pt = input("\nWhich actor?")
+        if pt is None:
+            raise ValueError("Must be provided!")
         # TO DO
         break
     elif navigate == '5':
         pt = input("\nWhich year?")
+        if pt is None:
+            raise ValueError("Must be provided!")
         # TO DO
         break
     elif navigate == '6':
