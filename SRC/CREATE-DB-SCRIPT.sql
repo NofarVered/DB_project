@@ -94,3 +94,22 @@ DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
 
+-- -----------------------------------------------------
+-- INDEXING
+-- -----------------------------------------------------
+CREATE FULLTEXT INDEX overview_index ON movies(overview);
+CREATE INDEX actors_index ON actors (actor_name);
+CREATE INDEX genres_index ON genres (genre);
+
+-- -----------------------------------------------------
+-- VIEW
+-- -----------------------------------------------------
+
+CREATE VIEW top50_movies AS
+SELECT title
+from movies
+order by popularity desc
+limit 50;
+CREATE VIEW amount_movies_in_db AS
+SELECT count(distinct movie_id) as amount_movies
+from movies

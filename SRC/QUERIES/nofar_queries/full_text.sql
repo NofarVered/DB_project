@@ -1,10 +1,19 @@
-select genres.genre, round(pct, 2) as pct
-from (
-         select distinct genre_id,
-                         100 * count(*) over (partition by genre_id) / count(*) over () as pct
-         from movies m
-                  join movie_genres mg on m.id = mg.movie_id
-         where MATCH(overview, tagline) AGAINST('+sleep +nightmare' IN BOOLEAN MODE)
-     ) a
-         join genres on a.genre_id = genres.id
-order by pct desc;
+            -- select m.movie_id,
+            --     m.title,
+            --     count(distinct a.id) as amount_relevant_actors,
+            --     count(distinct g.genre_id) as amount_relevant_genres,
+            --     match(overview) against ("{keywords}") as overview_match_score
+            -- from genres as g
+            -- join movies_genres as mg
+            -- on g.genre_id = mg.genre_id
+            -- join movies as m
+            -- on m.movie_id = mg.movie_id
+            -- join movies_actors as ma
+            -- on ma.movie_id = m.movie_id
+            -- join actors as a
+            -- on a.id = ma.actor_id
+            -- where ({actors_where_clause})
+            --     and
+            --     ({genres_where_clause})
+            -- group by m.movie_id, m.title
+            -- limit 50
