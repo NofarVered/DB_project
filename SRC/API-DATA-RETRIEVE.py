@@ -1,41 +1,29 @@
-# -- TO DO : update the api + update new apis
-
-
-
-import pymysql as mysql
-import mysql.connector as connector  # Kathy's library
+from re import A
 import pandas as pd
-import omdb  # The db that wasn't used in our reference's code
+import pymysql as mysql
+import imdb
 import tmdbv3api  # tmdbv3api documentation- https://github.com/AnthonyBloomer/tmdbv3api
-# Just attempts of mine with several libraries
-import omdbapi
-import requests
-import json
-import time
-import zlib
-import urllib
-from imdb import IMDb
-API_URL = "http://www.omdbapi.com"
-API_KEY = "dcf700b1"
-REQUEST_URL = API_URL+"?apikey="+API_KEY+"&"
+
+
+ia = imdb.Cinemagoer()
 
 MAX_SIZE = 30000
 
-INSERT_INTO_ACTORS = """INSERT INTO Actors
-                        VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
 
-INSERT_INTO_MOVIES = """ INSERT INTO Movies (id, imdb_id, title, runtime, popularity, poster_path, release_date, boxOffice_dollars)
-                            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)"""
+INSERT_INTO_ACTORS = """INSERT INTO Actors (imdb_id, name, sex, birthday, deathday, popularity, adult,  place_of_birth )
+                        VALUES(%s,%s,%s,%s,%s,%s,%s,%s)"""
+
+INSERT_INTO_MOVIES = """ INSERT INTO Movies (imdb_id, title, rating, run_time, popularity, release_date, profit)
+                            VALUES (%s,%s,%s,%s,%s,%s,%s)"""
 
 INSERT_INTO_GENRES = """INSERT INTO Genres VALUES (%s, %s)"""
 
-INSERT_INTO_COMPANIES = """INSERT INTO Companies (company_id, name, description, headquarters, origin_country, homepage, logo_path)
-                                      VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+#INSERT_INTO_COMPANIES = """INSERT INTO Companies (company_id, name, description, headquarters, origin_country, homepage, logo_path)
+#VALUES (%s, %s, %s, %s, %s, %s, %s)"""
 
 
 user_pswd_dbname = 'DbMysql36'
-#import os
-#os.system("ssh -fN -L 3307:nova.cs.tau.ac.il:3306 itaizemah@nova.cs.tau.ac.il")
+
 mydb = mysql.connect(
     host='127.0.0.1',
     port=3305,
@@ -47,7 +35,7 @@ mydb = mysql.connect(
 mycursor = mydb.cursor()
 
 
-# Like in the documentation I gave in the link above
+#Like in the documentation I gave in the link above
 tmdb_API_KEY = "5827703e0b9f7a1f8b21b2928c293f5f"
 #tmdb_Read_ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiI1ODI3NzAzZTBiOWY3YTFmOGIyMWIyOTI4YzI5M2Y1ZiIsInN1YiI6IjYxYzVlYmE4ZWNhZWY1MDA0MmEyOWJlYyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.eVet_jIYmyE6rIf6_RU_Wg77i7daZChQTQr3zLuFhAg"
 tmdb = tmdbv3api.TMDb()
@@ -60,87 +48,85 @@ def convert_to_null(val):
         return "NULL"
     return val
 
-# In some places in the file, I use json.loads, but I don't know if this is necessary
 
 
 def load_tmdb_actors():
-    per = tmdbv3api.Person()
-    # in tmdb, sex is 0,1,2. so I used this list in a way that 0,1,2 are the indexes of the correct values (I did it as an enum)
-    sex_convert = ['Other', 'Female', 'Male']
-    # Same as sex_convert, I tried to make sure the "true" value from the api will be converted to our tinyiny
-    FalseOrTrue = {'True': 1, 'False': 0}
-    actor_count = 0  # In the Person part of the API, there are directors and writers as well. So if we want N actors in our db, we need to count the actors like that
-    i = 0
-    while actor_count < MAX_SIZE:
-        # converted the result to json for an easier update to our db
-        p = json.loads(per.details(i))
-        i += 1
-        if p['known_for_department'] == 'acting':
-            actor_count += 1
-            mycursor.execute(INSERT_INTO_ACTORS, p['id'], p['name'], sex_convert[p['gender']], p['birthday'], convert_to_null(p['deathday']), convert_to_null(p['biography']), float(
-                p['popularity']),  p['imdb_id'], FalseOrTrue[p['adult']], convert_to_null(p['homepage']),  convert_to_null(p['profile_path']), convert_to_null(p['place_of_birth']))
+   per = tmdbv3api.Person()
+   # in tmdb, sex is 0,1,2. so I used this list in a way that 0,1,2 are the indexes of the correct values (I did it as an enum)
+   sex_convert = ['Other', 'Female', 'Male']
+   # Same as sex_convert, I tried to make sure the "true" value from the api will be converted to our tinyiny
+   FalseOrTrue = {'True': 1, 'False': 0}
+   actor_count = 0  # In the Person part of the API, there are directors and writers as well. So if we want N actors in our db, we need to count the actors like that
+   i = 0
+   while actor_count < MAX_SIZE:
+       # converted the result to json for an easier update to our db
+       p = per.details(i)
+       i += 1
+       if p['known_for_department'] == 'acting':
+           try:
+               person_id = ia.get_imdbID(p.name)
+           except:
+               #Handling the case where an actor exists in tmdb, but not in imdb
+               continue
+           actor_count += 1
+           mycursor.execute(INSERT_INTO_ACTORS, person_id, p.name, sex_convert[p.gender], p.birthday, convert_to_null(
+               p.deathday), float(p.popularity), FalseOrTrue[p.adult],  convert_to_null(p.place_of_birth))
+           mydb.commit()
 
 
-def load_tmdb_popular_movies():
+def load_tmdb_movies():
     movie = tmdbv3api.Movie()
-    popular = movie.popular()
     for i in range(MAX_SIZE):
         try:
-            p = json.loads(popular.details(i))
+            p = movie.details(i)
         except:
+            #in case i>T(R)
             break
-        mycursor.execute(INSERT_INTO_MOVIES, p['id'], p['imdb_id'], p['title'], p['runtime'], p['popularity'], convert_to_null(
-            p['poster_path']), p['release_date'], p['revenue'])
+        mov = ia.get_movie(parseImdbId(p.imdb_id))
+        mycursor.execute(INSERT_INTO_MOVIES, p.imdb_id, p.title, mov['user rating'], p.runtime, p.popularity, convert_to_null(
+            p.poster_path), p.release_date, p.revenue)
         mydb.commit()
+        load_movie_actors(p.imdb_id)
+        load_movie_genres(p)
 
 
-def load_genres(genre):
+def load_genres():
     genre = tmdbv3api.Genre()
     for g in genre.movie_list():
-        mycursor.execute(INSERT_INTO_GENRES, int(g["id"]), g["name"])
+        mycursor.execute(INSERT_INTO_GENRES, g.id, g.name)
         mydb.commit()
 
 
-def load_companies():
-    from tmdbv3api import Company
-    company = Company()
-    for i in range(MAX_SIZE):
-        try:
-            details = company.details(i)
-        except:
-            break
-        params = [details.id, details.name, details.description, details.headquarters,
-                  details.origin_country, details.homepage, details.logo_path]
-        mycursor.execute(INSERT_INTO_COMPANIES, params)
+def load_movie_genres(movie_details):
+    INSERT_INTO_MOVIE_GENRES = "INSERT INTO Movie_genres (movie_id, genre_id) VALUES (%s,%s)"
+    genres = movie_details.genres
+    for g in genres:
+        mycursor.execute(INSERT_INTO_MOVIE_GENRES, movie_details.imdb_id, g.id)
         mydb.commit()
 
 
-def load_movie_companies():
-    load_connecting_table = """INSERT INTO Movie_companies (movie_id, company_id)
-                            VALUES (%s, %s)"""
-    from tmdbv3api import Movie
-    popular_movies = Movie.popular()
-    for i in range(MAX_SIZE):
-        try:
-            dets = popular_movies.details(i)
-        except:
-            break
-        comp = json.loads(dets.production_companies)
-        for c in comp:
-            mycursor.execute(load_connecting_table, i, c["id"])
-            mydb.commit()
+def parseImdbId(movie_id):
+    return movie_id[2:]
 
 
-def load_movie_actors():
-    # We need to complete this. What I think we need to do is try to load these connections from the imdb csvs or the imdb APIs Einav used
-    return 0
+def load_movie_actors(movie_id):
+   INSERT_INTO_MOVIE_ACTORS = "INSERT INTO Movie_actors (movie_id, actor_id) VALUES (%s,%s)"
+   movie_id = parseImdbId(movie_id)
+   # If this outputs an error, try with str()
+   imdb_movie = ia.get_movie(movie_id)
+   try:
+       cast = imdb_movie['cast']
+   except:
+       print("Movie isn't in IMDb, conitnue to next one please")
+   for actor in cast:
+       actor_id = ia.get_imdbID(actor['name'])
+       mycursor.execute(INSERT_INTO_MOVIE_ACTORS, movie_id, actor_id)
+       mydb.commit()
 
 
 if __name__ == "__main__":
-
-    # incomplete
-    load_companies()
-    load_tmdb_actors()
     load_genres()
+    load_tmdb_actors()
+    load_tmdb_movies
     mycursor.close()
     mydb.close()
