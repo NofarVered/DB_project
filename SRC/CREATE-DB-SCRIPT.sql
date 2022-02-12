@@ -96,9 +96,9 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- -----------------------------------------------------
 -- INDEXING
 -- -----------------------------------------------------
-CREATE FULLTEXT INDEX title_index ON Movies(title);
-CREATE INDEX rating_index ON Movies (rating);
-CREATE INDEX profit_index ON Movies (profit);
+CREATE FULLTEXT INDEX name_index ON Actors(name);
+CREATE INDEX rating_index ON Movies(rating);
+CREATE INDEX profit_index ON Movies(profit);
 
 -- -----------------------------------------------------
 -- VIEW
