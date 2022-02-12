@@ -93,13 +93,12 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
-
 -- -----------------------------------------------------
 -- INDEXING
 -- -----------------------------------------------------
-CREATE FULLTEXT INDEX overview_index ON movies(overview);
-CREATE INDEX actors_index ON Actors (actor_name);
-CREATE INDEX genres_index ON Genres (genre);
+CREATE FULLTEXT INDEX title_index ON Movies(title);
+CREATE INDEX rating_index ON Movies (rating);
+CREATE INDEX profit_index ON Movies (profit);
 
 -- -----------------------------------------------------
 -- VIEW
