@@ -24,7 +24,7 @@ while (True):
     What would you like to know today?
     1 - I want to know what is the total profit of all the movies X-actor played on.
     2 - I want to know what is the average profit for X-genere movies.
-    3 - I want to know how many actors from X-gender, played in the top ten leading movie by profit
+    3 - I want to know how many actors from X-gender, played in the top ten leading movie by profit.
     4 - I want to know what is the average rating that X-actor got for her\his movies.
     5 - I want to know what is the the most popular language at movies in the X-year.
     6 - ITAI QUERIS
