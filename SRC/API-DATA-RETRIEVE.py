@@ -1,4 +1,4 @@
-from re import A
+
 import pandas as pd
 import pymysql as mysql
 import imdb
