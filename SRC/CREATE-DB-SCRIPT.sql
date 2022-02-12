@@ -14,11 +14,15 @@ USE `DbMysql36` ;
 -- Table `DbMysql36`.`Actors` 1
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `DbMysql36`.`Actors` (
-  `id` INT(11) NOT NULL ,
+  `imdb_id` INT(11) NOT NULL ,
   `name` VARCHAR(45) NOT NULL ,
-  `gender` ENUM('Male', 'Female', 'Other') NULL DEFAULT NULL,
+  `sex` ENUM('Male', 'Female', 'Other') NULL NOT NULL,
   `popularity` FLOAT NULL DEFAULT NULL,
-   PRIMARY KEY (`id`),
+  'adult' INT(11) DEFAULT NULL,
+  'deathday'DATE NULL DEFAULT NULL,
+  'birthday' DATE NULL DEFAULT NULL, 
+  'place_of_birth' VARCHAR(50) NOT NULL,
+   PRIMARY KEY (`imdb_id`),
 )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
@@ -37,39 +41,24 @@ DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
 -- -----------------------------------------------------
--- Table `DbMysql36`.`IMDB_ratings` 3
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `DbMysql36`.'IMDB_ratings' (
-  `imdb_id` INT(11) NOT NULL,
-   'rating' FLOAT,
-   PRIMARY KEY (`imdb_id`),
-   )
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
--- -----------------------------------------------------
--- Table `DbMysql36`.`Movies` 4
+-- Table `DbMysql36`.`Movies` 3
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `DbMysql36`.`Movies` (
- `id` INT(11) NOT NULL,
  `imdb_id`  INT(11) NOT NULL,
   `title` VARCHAR(150) NULL DEFAULT NULL,
   'language' VARCHAR(10),
-  `popularity` FLOAT NULL DEFAULT NULL,
+  `rating` FLOAT NULL DEFAULT NULL,
   `release_date` DATE NULL DEFAULT NULL,
   `profit` DOUBLE(12,2) NULL DEFAULT NULL, 
-   PRIMARY KEY (`id`, 'imdb_id'),
-   CONSTRAINT `imdb_id`
-   FOREIGN KEY (`imdb_id`)
-   REFERENCES `DbMysql36`.`IMDB_ratings` (`imdb_id`),
+  'run_time' INT(11) NULL DEFAULT NULL,
+   PRIMARY KEY ('imdb_id'),
 )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
 -- -----------------------------------------------------
--- Table `DbMysql36`.`Movie_actors` 5
+-- Table `DbMysql36`.`Movie_actors` 4
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `DbMysql36`.`Movie_actors` (
   `movie_id` INT(11) NOT NULL,
@@ -77,17 +66,17 @@ CREATE TABLE IF NOT EXISTS `DbMysql36`.`Movie_actors` (
   PRIMARY KEY (`movie_id`, `actor_id`),
   CONSTRAINT `actor_id`
     FOREIGN KEY (`actor_id`)
-    REFERENCES `DbMysql36`.`actors` (`id`),
+    REFERENCES `DbMysql36`.`Actors` (`imdb_id`),
   CONSTRAINT `movie_id`
     FOREIGN KEY (`movie_id`)
-    REFERENCES `DbMysql36`.`movies` (`id`))
+    REFERENCES `DbMysql36`.`Movies` (`imdb_id`))
 )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
 -- -----------------------------------------------------
--- Table `DbMysql36`.`Movie_genres` 6
+-- Table `DbMysql36`.`Movie_genres` 5
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `DbMysql36`.`Movie_genres` (
   `movie_id` INT(11) NOT NULL,
@@ -96,9 +85,9 @@ CREATE TABLE IF NOT EXISTS `DbMysql36`.`Movie_genres` (
   CONSTRAINT `genre_id`
     FOREIGN KEY (`genre_id`)
     REFERENCES `DbMysql36`.`Genres` (`id`),
-  CONSTRAINT `movie_id_FK`
+  CONSTRAINT `movie_id`
     FOREIGN KEY (`movie_id`)
-    REFERENCES `DbMysql36`.`Movies` (`id`)
+    REFERENCES `DbMysql36`.`Movies` (`imdb_id`)
 )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
