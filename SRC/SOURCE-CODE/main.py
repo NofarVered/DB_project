@@ -1,13 +1,19 @@
-# from queries-manager import
-import pymysql
+import utils
+import mysql.connector
 
-CONNECTOR = pymysql.connect(
+CONNECTOR = mysql.connector.connect(
     host='localhost',
     port=3305,
     user='DbMysql36',
     password='DbMysql36',
     database='DbMysql1536'
 )
+print(CONNECTOR)
+mycursor = CONNECTOR.cursor()
+mycursor.execute("SHOW TABLES")
+for tb in mycursor:
+    print(tb)
+
 
 while (True):
     what_to_ask = """
