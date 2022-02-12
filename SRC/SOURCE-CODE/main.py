@@ -42,7 +42,7 @@ while (True):
         pt = input("\nWhich genere?")
         if pt is None:
             raise ValueError("Must be provided!")
-        # TO DO
+        utils.get_2(mycursor, pt)
         break
     elif navigate == '3':
         pt = input("\nWhich gender?")
