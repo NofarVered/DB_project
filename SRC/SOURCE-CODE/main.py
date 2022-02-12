@@ -27,18 +27,23 @@ while (True):
     navigate = input(what_to_ask)
 
     if navigate == '1':
+        pt = input("\nWhich actor?")
         # TO DO
         break
     elif navigate == '2':
+        pt = input("\nWhich genere?")
         # TO DO
         break
     elif navigate == '3':
+        pt = input("\nWhich gender?")
         # TO DO
         break
     elif navigate == '4':
+        pt = input("\nWhich actor?")
         # TO DO
         break
     elif navigate == '5':
+        pt = input("\nWhich year?")
         # TO DO
         break
     elif navigate == '6':
@@ -48,8 +53,5 @@ while (True):
         # TO DO
         break
 
-    query_pop_view = "select * from top50_movies"
-    query.execute_query(query_pop_view)
-    print(CONNECTOR.cursor.fetchall())
 
 CONNECTOR.close()
