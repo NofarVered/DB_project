@@ -16,9 +16,7 @@ CREATE TABLE IF NOT EXISTS `DbMysql36`.`Actors` (
   `name` VARCHAR(45) NOT NULL ,
   `sex` ENUM('Male', 'Female', 'Other') NULL NOT NULL,
   `popularity` FLOAT NULL DEFAULT NULL,
-  `adult` INT(11) DEFAULT NULL,
-  `deathday` DATE NULL DEFAULT NULL, 
-  `place_of_birth` VARCHAR(50) NOT NULL,
+  `adult` INT(11) DEFAULT NULL, 
    PRIMARY KEY (`imdb_id`)
 )
 ENGINE = InnoDB
