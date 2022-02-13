@@ -67,7 +67,12 @@ while (True):
             CONNECTOR, "sqls/What_is_the_aver_run_time_in_movies_released_at_X_5.sql", pt)
         break
     elif navigate == '6':
-        # TO DO
+        pt1 = input("\nWhich year?")
+        pt2 = input("\nWhich genre?")
+        if pt1 is None or pt2 is None:
+            raise ValueError("Must be provided!")
+        run_sql_file(
+            CONNECTOR, "sqls/yearly_change_6.sql", (pt1, pt2))
         break
     elif navigate == '7':
         # TO DO
