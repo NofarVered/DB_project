@@ -16,11 +16,11 @@ CREATE TABLE IF NOT EXISTS `DbMysql36`.`Actors` (
   `name` VARCHAR(45) NOT NULL ,
   `sex` ENUM('Male', 'Female', 'Other') NULL NOT NULL,
   `popularity` FLOAT NULL DEFAULT NULL,
-  'adult' INT(11) DEFAULT NULL,
-  'deathday'DATE NULL DEFAULT NULL,
-  'birthday' DATE NULL DEFAULT NULL, 
-  'place_of_birth' VARCHAR(50) NOT NULL,
-   PRIMARY KEY (`imdb_id`),
+  `adult` INT(11) DEFAULT NULL,
+  `deathday` DATE NULL DEFAULT NULL,
+  `birthday` DATE NULL DEFAULT NULL, 
+  `place_of_birth` VARCHAR(50) NOT NULL,
+   PRIMARY KEY (`imdb_id`)
 )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
@@ -47,8 +47,8 @@ CREATE TABLE IF NOT EXISTS `DbMysql36`.`Movies` (
   `rating` FLOAT NULL DEFAULT NULL,
   `release_date` DATE NULL DEFAULT NULL,
   `profit` DOUBLE(12,2) NULL DEFAULT NULL, 
-  'run_time' INT(11) NULL DEFAULT NULL,
-   PRIMARY KEY ('imdb_id'),
+  `run_time` INT(11) NULL DEFAULT NULL,
+   PRIMARY KEY (`imdb_id`)
 )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
@@ -66,7 +66,7 @@ CREATE TABLE IF NOT EXISTS `DbMysql36`.`Movie_actors` (
     REFERENCES `DbMysql36`.`Actors` (`imdb_id`),
   CONSTRAINT `movie_id`
     FOREIGN KEY (`movie_id`)
-    REFERENCES `DbMysql36`.`Movies` (`imdb_id`))
+    REFERENCES `DbMysql36`.`Movies` (`imdb_id`)
 )
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
@@ -82,7 +82,7 @@ CREATE TABLE IF NOT EXISTS `DbMysql36`.`Movie_genres` (
   CONSTRAINT `genre_id`
     FOREIGN KEY (`genre_id`)
     REFERENCES `DbMysql36`.`Genres` (`id`),
-  CONSTRAINT `movie_id`
+  CONSTRAINT `genre_movie_id`
     FOREIGN KEY (`movie_id`)
     REFERENCES `DbMysql36`.`Movies` (`imdb_id`)
 )
@@ -102,4 +102,14 @@ CREATE INDEX profit_index ON Movies(profit);
 -- -----------------------------------------------------
 CREATE VIEW amount_movies_in_db AS
 SELECT count(distinct Movies.imdb_id) as amount
-FROM Movies
+FROM Movies;
+
+CREATE VIEW Genre_Yearly_Revenues AS 
+SELECT Genres.name, YEAR(x.release_date) AS `Work Year`, SUM(y.profit) AS `Revenues`
+FROM Movies x, Movies y, Movie_genres, Genres
+WHERE Movie_genres.genre_id= Genres.id AND x.id= Movie_genres.movie_id
+AND x.id= y.id
+GROUP BY Genres.name, `Work Year`
+ORDER BY `Work Year` DESC;
+
+
