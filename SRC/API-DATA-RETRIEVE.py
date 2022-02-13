@@ -7,10 +7,10 @@ import tmdbv3api  # tmdbv3api documentation- https://github.com/AnthonyBloomer/t
 
 ia = imdb.Cinemagoer()
 
-MAX_SIZE = 3000
+MAX_SIZE = 8
 
-INSERT_INTO_ACTORS = """INSERT INTO Actors (imdb_id, name, sex, birthday, deathday, popularity, adult,  place_of_birth )
-                        VALUES(%s,%s,%s,%s,%s,%s,%s,%s)"""
+INSERT_INTO_ACTORS = """INSERT INTO Actors (imdb_id, name, sex, popularity, adult)
+                        VALUES(%s,%s,%s,%s,%s)"""
 
 INSERT_INTO_MOVIES = """ INSERT IGNORE INTO Movies (imdb_id, title, rating, run_time,  release_date, profit)
                             VALUES (%s,%s,%s,%s,%s,%s)"""
@@ -36,7 +36,7 @@ def convert_to_null(val):
 # In some places in the file, I use json.loads, but I don't know if this is necessary
 
 
-def load_actors(cast):
+def load_actors(credits, id):
     from tmdbv3api import Person, Search
     mycursor = CONNECTOR.cursor()
     per = tmdbv3api.Person()
@@ -48,26 +48,13 @@ def load_actors(cast):
     i = 1
     per = Person()
     search = Search()
+    cast= credits['cast']
     for actor in cast:
-        # converted the result to json for an easier update to our db
-        try:
-            result = search.people({"query": actor})
-            id = result['results']['id']
-            p = per.details(id)
-        except:
-            i += 1
-            continue
-        i += 1
-        if p.known_for_department == 'acting':
-            try:
-                person_id = ia.get_imdbID(p.name)
-            except:
-                # Handling the case where an actor exists in tmdb, but not in imdb
-                continue
-            actor_count += 1
-            mycursor.execute(INSERT_INTO_ACTORS, [person_id, p.name, sex_convert[p.gender], p.birthday, convert_to_null(
-                p.deathday), float(p.popularity), FalseOrTrue[p.adult],  convert_to_null(p.place_of_birth)])
-            CONNECTOR.commit()
+        
+        
+        mycursor.execute(INSERT_INTO_ACTORS, [actor['id'], actor['name'], sex_convert[actor['gender']],  float(actor['popularity']), actor['adult']])
+        actor_count += 1
+        CONNECTOR.commit()
     mycursor.close()
 
 
@@ -77,25 +64,33 @@ def load_tmdb_movies():
     movie_count = 0
     i = 1
     while movie_count < MAX_SIZE:
+        print(i)
         try:
             p = movie.details(i)
         except:
+            print("skipping id ", i)
             i += 1
             continue
         i += 1
         try:
             mov = ia.get_movie(parseImdbId(p.imdb_id))
         except:
-            continue
+            print("Movie not found on imdb")
 
         mycursor.execute(INSERT_INTO_MOVIES, [parseImdbId(
             p.imdb_id), p.title, mov['user rating'], p.runtime, p.release_date, p.revenue])
         CONNECTOR.commit()
         try:
-            load_actors(mov['cast'])
-            load_movie_actors(p.imdb_id)
-        except:
-            pass
+            #print("loading actors ", i)
+            load_actors(movie.credits(i),i)
+            
+        except Exception as e:
+            print(e)
+            print("no actors on movie", p.title)
+        try:
+            load_movie_actors(p.imdb_id, movie.credits(i)['cast'] )
+        except Exception as e:
+            print(e)
         load_movie_genres(p)
         movie_count += 1
     mycursor.close()
@@ -125,19 +120,11 @@ def parseImdbId(movie_id):
     return movie_id[2:]
 
 
-def load_movie_actors(movie_id):
+def load_movie_actors(movie_id, cast):
     mycursor = CONNECTOR.cursor()
     INSERT_INTO_MOVIE_ACTORS = "INSERT IGNORE INTO Movie_actors (movie_id, actor_id) VALUES (%s,%s)"
-    movie_id = parseImdbId(movie_id)
-    # If this outputs an error, try with str()
-    imdb_movie = ia.get_movie(movie_id)
-    try:
-        cast = imdb_movie['cast']
-    except:
-        print("Movie isn't in IMDb, conitnue to next one please")
     for actor in cast:
-        actor_id = ia.get_imdbID(actor)
-        mycursor.execute(INSERT_INTO_MOVIE_ACTORS, [movie_id, actor_id])
+        mycursor.execute(INSERT_INTO_MOVIE_ACTORS, [movie_id, actor['id']])
         CONNECTOR.commit()
     mycursor.close()
 
