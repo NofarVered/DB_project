@@ -1,6 +1,6 @@
-
 import pandas as pd
 import pymysql as mysql
+import mysql.connector
 import imdb
 import tmdbv3api  # tmdbv3api documentation- https://github.com/AnthonyBloomer/tmdbv3api
 
@@ -8,7 +8,6 @@ import tmdbv3api  # tmdbv3api documentation- https://github.com/AnthonyBloomer/t
 ia = imdb.Cinemagoer()
 
 MAX_SIZE = 3000
-
 
 INSERT_INTO_ACTORS = """INSERT INTO Actors (imdb_id, name, sex, birthday, deathday, popularity, adult,  place_of_birth )
                         VALUES(%s,%s,%s,%s,%s,%s,%s,%s)"""
@@ -20,20 +19,6 @@ INSERT_INTO_GENRES = """INSERT INTO Genres VALUES (%s, %s)"""
 
 # INSERT_INTO_COMPANIES = """INSERT INTO Companies (company_id, name, description, headquarters, origin_country, homepage, logo_path)
 # VALUES (%s, %s, %s, %s, %s, %s, %s)"""
-
-
-user_pswd_dbname = 'DbMysql36'
-
-mydb = mysql.connect(
-    host='127.0.0.1',
-    port=3305,
-    user=user_pswd_dbname,
-    password=user_pswd_dbname,
-    database=user_pswd_dbname
-)
-
-mycursor = mydb.cursor()
-
 
 # Like in the documentation I gave in the link above
 tmdb_API_KEY = "5827703e0b9f7a1f8b21b2928c293f5f"
@@ -53,6 +38,7 @@ def convert_to_null(val):
 
 def load_actors(cast):
     from tmdbv3api import Person, Search
+    mycursor = CONNECTOR.cursor()
     per = tmdbv3api.Person()
     # in tmdb, sex is 0,1,2. so I used this list in a way that 0,1,2 are the indexes of the correct values (I did it as an enum)
     sex_convert = ['Other', 'Female', 'Male']
@@ -81,11 +67,13 @@ def load_actors(cast):
             actor_count += 1
             mycursor.execute(INSERT_INTO_ACTORS, [person_id, p.name, sex_convert[p.gender], p.birthday, convert_to_null(
                 p.deathday), float(p.popularity), FalseOrTrue[p.adult],  convert_to_null(p.place_of_birth)])
-            mydb.commit()
+            CONNECTOR.commit()
+    mycursor.close()
 
 
 def load_tmdb_movies():
     movie = tmdbv3api.Movie()
+    mycursor = CONNECTOR.cursor()
     movie_count = 0
     i = 1
     while movie_count < MAX_SIZE:
@@ -102,7 +90,7 @@ def load_tmdb_movies():
 
         mycursor.execute(INSERT_INTO_MOVIES, [parseImdbId(
             p.imdb_id), p.title, mov['user rating'], p.runtime, p.release_date, p.revenue])
-        mydb.commit()
+        CONNECTOR.commit()
         try:
             load_actors(mov['cast'])
             load_movie_actors(p.imdb_id)
@@ -110,22 +98,27 @@ def load_tmdb_movies():
             pass
         load_movie_genres(p)
         movie_count += 1
+    mycursor.close()
 
 
 def load_genres():
     genre = tmdbv3api.Genre()
+    mycursor = CONNECTOR.cursor()
     for g in genre.movie_list():
         mycursor.execute(INSERT_INTO_GENRES, [g.id, g.name])
-        mydb.commit()
+        CONNECTOR.commit()
+    mycursor.close()
 
 
 def load_movie_genres(movie_details):
+    mycursor = CONNECTOR.cursor()
     INSERT_INTO_MOVIE_GENRES = "INSERT IGNORE INTO Movie_genres (movie_id, genre_id) VALUES (%s,%s)"
     genres = movie_details.genres
     for g in genres:
         mycursor.execute(INSERT_INTO_MOVIE_GENRES, [
                          movie_details.imdb_id, g.id])
-        mydb.commit()
+        CONNECTOR.commit()
+    mycursor.close()
 
 
 def parseImdbId(movie_id):
@@ -133,6 +126,7 @@ def parseImdbId(movie_id):
 
 
 def load_movie_actors(movie_id):
+    mycursor = CONNECTOR.cursor()
     INSERT_INTO_MOVIE_ACTORS = "INSERT IGNORE INTO Movie_actors (movie_id, actor_id) VALUES (%s,%s)"
     movie_id = parseImdbId(movie_id)
     # If this outputs an error, try with str()
@@ -144,13 +138,20 @@ def load_movie_actors(movie_id):
     for actor in cast:
         actor_id = ia.get_imdbID(actor)
         mycursor.execute(INSERT_INTO_MOVIE_ACTORS, [movie_id, actor_id])
-        mydb.commit()
+        CONNECTOR.commit()
+    mycursor.close()
 
 
 if __name__ == "__main__":
+    CONNECTOR = mysql.connector.connect(
+        host='127.0.0.1',
+        port=3305,
+        user='DbMysql36',
+        password='DbMysql36',
+        database='DbMysql36'
+    )
     print("Beginning insertion")
     # load_genres()
     load_tmdb_movies()
     print("Success!")
-    mycursor.close()
-    mydb.close()
+    CONNECTOR.close()

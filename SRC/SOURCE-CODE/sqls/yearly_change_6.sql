@@ -4,8 +4,8 @@ FROM
         Yearly_revenue.revenues,
         LAG (revenues) OVER (ORDER BY YEAR) AS past_year_revenue
 FROM Yearly_revenue, Genres
-WHERE Yearly_revenue.YEAR= "%s"
-AND Genres.name= "%s"
+WHERE Yearly_revenue.YEAR= {user_year}
+AND Genres.name= {user_genre}
 AND past_year_revenue IS NOT NULL
 ) AS Q
 LIMIT 1 
