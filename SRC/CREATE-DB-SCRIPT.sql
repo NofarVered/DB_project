@@ -44,7 +44,6 @@ COLLATE = utf8mb4_0900_ai_ci;
 CREATE TABLE IF NOT EXISTS `DbMysql36`.`Movies` (
  `imdb_id`  INT(11) NOT NULL,
   `title` VARCHAR(150) NULL DEFAULT NULL,
-  'language' VARCHAR(10),
   `rating` FLOAT NULL DEFAULT NULL,
   `release_date` DATE NULL DEFAULT NULL,
   `profit` DOUBLE(12,2) NULL DEFAULT NULL, 
