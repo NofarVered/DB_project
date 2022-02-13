@@ -1,14 +1,14 @@
 SELECT CONCAT("What is the average rating that %s (actor) got for her\his movies?") AS question, 
-AVG(a.rt) AS answer
+a.avg_rating AS answer
 FROM     
-	(SELECT DISTINCT Movies.imdb_id AS id, Movies.rating AS rt, Actors.name AS nm
+	(SELECT Actors.name AS act_name, AVG(Movies.rating) AS avg_rating
     FROM    
         Movies
-        LEFT JOIN
+        INNER JOIN
             Movies ON Movies.imdb_id = Movie_actors.movie_id
-        LEFT JOIN
+        INNER JOIN
         Actors ON Actors.imdb_id = Movie_actors.actor_id
-		GROUP BY nm) a
-WHERE a.nm = %s
+		GROUP BY act_name) a
+WHERE a.act_name = %s
 LIMIT 1
 END
