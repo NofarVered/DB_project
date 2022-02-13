@@ -17,8 +17,7 @@ CREATE TABLE IF NOT EXISTS `DbMysql36`.`Actors` (
   `sex` ENUM('Male', 'Female', 'Other') NULL NOT NULL,
   `popularity` FLOAT NULL DEFAULT NULL,
   `adult` INT(11) DEFAULT NULL,
-  `deathday` DATE NULL DEFAULT NULL,
-  `birthday` DATE NULL DEFAULT NULL, 
+  `deathday` DATE NULL DEFAULT NULL, 
   `place_of_birth` VARCHAR(50) NOT NULL,
    PRIMARY KEY (`imdb_id`)
 )
