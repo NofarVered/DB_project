@@ -10,7 +10,3 @@ def run_sql_file(CONNECTOR, sql_path, pt):
     for row in result:
         print(row)
     cur.close()
-
-
-def get_2(mycursor, pt):
-    print(q2)
