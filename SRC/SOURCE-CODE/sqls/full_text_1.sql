@@ -4,6 +4,8 @@ SELECT
 FROM
     Movies AS m, amount_movies_in_db AS ma
 WHERE
-	  MATCH(title) AGAINST( %s IN BOOLEAN MODE)
+	  MATCH(Movies.title) AGAINST( %s IN BOOLEAN MODE)
+GROUP BY m.imdb_id
 LIMIT 1
 END
+
