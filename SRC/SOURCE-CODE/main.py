@@ -1,4 +1,5 @@
-import utils
+import imp
+from utils import run_sql_file
 import mysql.connector
 
 CONNECTOR = mysql.connector.connect(
@@ -36,31 +37,34 @@ while (True):
         pt = input("\nWhich actor?")
         if pt is None:
             raise ValueError("Must be provided!")
-        # TO DO
+        run_sql_file(CONNECTOR, "sqls/full_text_1.sql", pt)
         break
     elif navigate == '2':
         pt = input("\nWhich genere?")
         if pt is None:
             raise ValueError("Must be provided!")
-        utils.get_2(mycursor, pt)
+        run_sql_file(CONNECTOR, "sqls/avg_genre_X_profit_2.sql", pt)
         break
     elif navigate == '3':
         pt = input("\nWhich gender?")
         if pt is None:
             raise ValueError("Must be provided!")
-        # TO DO
+        run_sql_file(
+            CONNECTOR, "sqls/How_many_X_actors_played_in_the_top_ten_movie_by_profit_3.sql", pt)
         break
     elif navigate == '4':
         pt = input("\nWhich actor?")
         if pt is None:
             raise ValueError("Must be provided!")
-        # TO DO
+        run_sql_file(
+            CONNECTOR, "sqls/What_is_the_average_rating_that_X_got_for_his_movies_4.sql", pt)
         break
     elif navigate == '5':
         pt = input("\nWhich year?")
         if pt is None:
             raise ValueError("Must be provided!")
-        # TO DO
+        run_sql_file(
+            CONNECTOR, "sqls/What_was_the_most_popular_language_of_a_movies_in_the_X_5.sql", pt)
         break
     elif navigate == '6':
         # TO DO
