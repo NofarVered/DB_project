@@ -13,6 +13,7 @@ mycursor = CONNECTOR.cursor()
 mycursor.execute("SHOW TABLES")
 for tb in mycursor:
     print(tb)
+mycursor.close()
 
 while (True):
     what_to_ask = """

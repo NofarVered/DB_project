@@ -1,11 +1,15 @@
+import mysql.connector
 
-def run_sql_file(CONNECTOR, sql_path, **fmt):
+
+def run_sql_file(CONNECTOR, sql_path, pt):
     cur = CONNECTOR.cursor()
     with open(sql_path, "r") as f:
-        cur.execute(f.read().format(**fmt))
+        query = f.read()
+        cur.execute(query, (pt))
         result = cur.fetchone()
+    for row in result:
+        print(row)
     cur.close()
-    return result
 
 
 def get_2(mycursor, pt):

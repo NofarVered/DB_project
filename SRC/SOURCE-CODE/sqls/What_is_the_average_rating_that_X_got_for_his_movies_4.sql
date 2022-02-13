@@ -9,6 +9,6 @@ FROM
         LEFT JOIN
         Actors ON Actors.imdb_id = Movie_actors.actor_id
 		GROUP BY nm) a
-WHERE a.nm= %s
+WHERE a.nm = %s
 LIMIT 1
 END

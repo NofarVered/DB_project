@@ -12,7 +12,7 @@ FROM
     ORDER BY Movies.profit DESC
     LIMIT 10) a
 WHERE
-    Actors.sex=%s
+    Actors.sex = %s
 LIMIT 1
 END
 
