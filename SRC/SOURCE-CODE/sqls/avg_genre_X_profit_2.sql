@@ -11,3 +11,4 @@ WHERE
 	  Genres.name = %s
 GROUP BY Genres.name
 LIMIT 1
+END

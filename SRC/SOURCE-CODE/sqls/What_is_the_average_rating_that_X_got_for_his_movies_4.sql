@@ -11,3 +11,4 @@ FROM
 		GROUP BY nm) a
 WHERE a.nm= %s
 LIMIT 1
+END
