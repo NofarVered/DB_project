@@ -1,22 +1,9 @@
--- I want to know what is the total profit of all the movies X-actor played on
-            
-            
-            -- select m.movie_id,
-            --     m.title,
-            --     count(distinct a.id) as amount_relevant_actors,
-            --     count(distinct g.genre_id) as amount_relevant_genres,
-            --     match(overview) against ("{keywords}") as overview_match_score
-            -- from genres as g
-            -- join movies_genres as mg
-            -- on g.genre_id = mg.genre_id
-            -- join movies as m
-            -- on m.movie_id = mg.movie_id
-            -- join movies_actors as ma
-            -- on ma.movie_id = m.movie_id
-            -- join actors as a
-            -- on a.id = ma.actor_id
-            -- where ({actors_where_clause})
-            --     and
-            --     ({genres_where_clause})
-            -- group by m.movie_id, m.title
-            -- limit 50
+SELECT
+    CONCAT("What is the total profit for movies that have the word %s in there title?") as question,
+    SUM(Movies.profit) as answer,
+FROM
+    Movies
+WHERE
+	  MATCH(title) AGAINST(%s IN BOOLEAN MODE)
+GROUP BY movie_id
+LIMIT 1
