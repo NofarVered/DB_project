@@ -7,14 +7,14 @@ import tmdbv3api  # tmdbv3api documentation- https://github.com/AnthonyBloomer/t
 
 ia = imdb.Cinemagoer()
 
-MAX_SIZE = 30000
+MAX_SIZE = 3000
 
 
 INSERT_INTO_ACTORS = """INSERT INTO Actors (imdb_id, name, sex, birthday, deathday, popularity, adult,  place_of_birth )
                         VALUES(%s,%s,%s,%s,%s,%s,%s,%s)"""
 
-INSERT_INTO_MOVIES = """ INSERT INTO Movies (imdb_id, title, rating, run_time, popularity, release_date, profit)
-                            VALUES (%s,%s,%s,%s,%s,%s,%s)"""
+INSERT_INTO_MOVIES = """ INSERT IGNORE INTO Movies (imdb_id, title, rating, run_time,  release_date, profit)
+                            VALUES (%s,%s,%s,%s,%s,%s)"""
 
 INSERT_INTO_GENRES = """INSERT INTO Genres VALUES (%s, %s)"""
 
@@ -48,60 +48,82 @@ def convert_to_null(val):
         return "NULL"
     return val
 
+#In some places in the file, I use json.loads, but I don't know if this is necessary
 
 
-def load_tmdb_actors():
+def load_actors(cast):
    per = tmdbv3api.Person()
    # in tmdb, sex is 0,1,2. so I used this list in a way that 0,1,2 are the indexes of the correct values (I did it as an enum)
    sex_convert = ['Other', 'Female', 'Male']
    # Same as sex_convert, I tried to make sure the "true" value from the api will be converted to our tinyiny
    FalseOrTrue = {'True': 1, 'False': 0}
    actor_count = 0  # In the Person part of the API, there are directors and writers as well. So if we want N actors in our db, we need to count the actors like that
-   i = 0
-   while actor_count < MAX_SIZE:
+   i = 1
+   from tmdbv3api import Person, Search
+   per= Person()
+   search = Search()
+   for actor in cast:
        # converted the result to json for an easier update to our db
-       p = per.details(i)
+       try:
+           result= search.people({"query": actor})
+           id= result['results']['id']
+           p= per.details(id)
+       except:
+           i+=1
+           continue
        i += 1
-       if p['known_for_department'] == 'acting':
+       if p.known_for_department == 'acting':
            try:
                person_id = ia.get_imdbID(p.name)
            except:
                #Handling the case where an actor exists in tmdb, but not in imdb
                continue
            actor_count += 1
-           mycursor.execute(INSERT_INTO_ACTORS, person_id, p.name, sex_convert[p.gender], p.birthday, convert_to_null(
-               p.deathday), float(p.popularity), FalseOrTrue[p.adult],  convert_to_null(p.place_of_birth))
+           mycursor.execute(INSERT_INTO_ACTORS, [person_id, p.name, sex_convert[p.gender], p.birthday, convert_to_null(
+               p.deathday), float(p.popularity), FalseOrTrue[p.adult],  convert_to_null(p.place_of_birth)])
            mydb.commit()
 
 
 def load_tmdb_movies():
     movie = tmdbv3api.Movie()
-    for i in range(MAX_SIZE):
+    movie_count=0
+    i=1
+    while movie_count<MAX_SIZE:
         try:
             p = movie.details(i)
         except:
-            #in case i>T(R)
-            break
-        mov = ia.get_movie(parseImdbId(p.imdb_id))
-        mycursor.execute(INSERT_INTO_MOVIES, p.imdb_id, p.title, mov['user rating'], p.runtime, p.popularity, convert_to_null(
-            p.poster_path), p.release_date, p.revenue)
+            i+=1
+            continue
+        i+=1
+        try:
+            mov = ia.get_movie(parseImdbId(p.imdb_id))
+        except:
+            continue
+        
+        mycursor.execute(INSERT_INTO_MOVIES, [parseImdbId(p.imdb_id), p.title, mov['user rating'], p.runtime, p.release_date, p.revenue])
         mydb.commit()
-        load_movie_actors(p.imdb_id)
+        try:
+            load_actors(mov['cast'])
+            load_movie_actors(p.imdb_id)
+        except:
+            pass
         load_movie_genres(p)
+        movie_count+=1
+
 
 
 def load_genres():
     genre = tmdbv3api.Genre()
     for g in genre.movie_list():
-        mycursor.execute(INSERT_INTO_GENRES, g.id, g.name)
+        mycursor.execute(INSERT_INTO_GENRES , [g.id, g.name])
         mydb.commit()
 
 
 def load_movie_genres(movie_details):
-    INSERT_INTO_MOVIE_GENRES = "INSERT INTO Movie_genres (movie_id, genre_id) VALUES (%s,%s)"
+    INSERT_INTO_MOVIE_GENRES = "INSERT IGNORE INTO Movie_genres (movie_id, genre_id) VALUES (%s,%s)"
     genres = movie_details.genres
     for g in genres:
-        mycursor.execute(INSERT_INTO_MOVIE_GENRES, movie_details.imdb_id, g.id)
+        mycursor.execute(INSERT_INTO_MOVIE_GENRES, [movie_details.imdb_id, g.id])
         mydb.commit()
 
 
@@ -110,7 +132,7 @@ def parseImdbId(movie_id):
 
 
 def load_movie_actors(movie_id):
-   INSERT_INTO_MOVIE_ACTORS = "INSERT INTO Movie_actors (movie_id, actor_id) VALUES (%s,%s)"
+   INSERT_INTO_MOVIE_ACTORS = "INSERT IGNORE INTO Movie_actors (movie_id, actor_id) VALUES (%s,%s)"
    movie_id = parseImdbId(movie_id)
    # If this outputs an error, try with str()
    imdb_movie = ia.get_movie(movie_id)
@@ -119,14 +141,15 @@ def load_movie_actors(movie_id):
    except:
        print("Movie isn't in IMDb, conitnue to next one please")
    for actor in cast:
-       actor_id = ia.get_imdbID(actor['name'])
-       mycursor.execute(INSERT_INTO_MOVIE_ACTORS, movie_id, actor_id)
+       actor_id = ia.get_imdbID(actor)
+       mycursor.execute(INSERT_INTO_MOVIE_ACTORS, [movie_id, actor_id])
        mydb.commit()
 
 
 if __name__ == "__main__":
-    load_genres()
-    load_tmdb_actors()
-    load_tmdb_movies
+    print("Beginning insertion")
+    #load_genres()
+    load_tmdb_movies()
+    print("Success!")
     mycursor.close()
     mydb.close()
