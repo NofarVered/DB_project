@@ -27,7 +27,7 @@ while (True):
     2 - I want to know what is the average profit for X-genere movies.
     3 - I want to know how many actors from X-gender, played in the top ten leading movie by profit.
     4 - I want to know what is the average rating that X-actor got for her\his movies.
-    5 - I want to know what is the the most popular language at movies in the X-year.
+    5 - I want to know what is the AVERAGE run time in movies released at X-year.
     6 - ITAI QUERIS
     7 - ITAI QUERIS
     """
@@ -64,7 +64,7 @@ while (True):
         if pt is None:
             raise ValueError("Must be provided!")
         run_sql_file(
-            CONNECTOR, "sqls/What_was_the_most_popular_language_of_a_movies_in_the_X_5.sql", pt)
+            CONNECTOR, "sqls/What_is_the_aver_run_time_in_movies_released_at_X_5.sql", pt)
         break
     elif navigate == '6':
         # TO DO
