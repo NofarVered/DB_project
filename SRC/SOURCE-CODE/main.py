@@ -75,7 +75,12 @@ while (True):
             CONNECTOR, "sqls/yearly_change_6.sql", (pt1, pt2))
         break
     elif navigate == '7':
-        # TO DO
+        pt1 = input("\nWhich genre?")
+        pt2 = input("\nHow many times?")
+        if pt1 is None or pt2 is None:
+            raise ValueError("Must be provided!")
+        run_sql_file(
+            CONNECTOR, "sqls/Actor_genre_X_frequency_7.sql", (pt1, pt2))
         break
 
 
