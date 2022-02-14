@@ -1,11 +1,16 @@
-SELECT
-    CONCAT("How many percent of the movies have the word {pt} in there name?") as question,
-    (COUNT(m.imdb_id)/ma.amount)*100 as answer,
-FROM
-    Movies AS m, amount_movies_in_db AS ma
-WHERE
-	  MATCH(Movies.title) AGAINST( {pt} IN BOOLEAN MODE)
-GROUP BY m.imdb_id
-LIMIT 1
-END
 
+SELECT CONCAT(" What is the average run time in movies from the most profitable genre at {pt} (year)? ") AS question,
+AVG(a.run_time) as answer
+FROM (SELECT Movies.run_time, Movies.imdb_id, Genres.name 
+		FROM Movies, Genres, Movie_genres, Genre_Yearly_Revenues
+		WHERE YEAR(Movies.release_date) =2008
+        AND Movie_genres.movie_id= Movies.imdb_id
+        AND Movie_genres.genre_id= Genres.id
+        AND Genre_Yearly_Revenues.Year= {pt}
+        AND Genre_Yearly_Revenues.name= Genres.name
+        AND Genre_Yearly_Revenues.Revenues>= ALL (SELECT Genre_Yearly_Revenues.Revenues 
+                                             FROM Genre_Yearly_Revenues
+                                             WHERE Year={pt})) AS a
+        
+ORDER BY answer DESC
+LIMIT 1;
