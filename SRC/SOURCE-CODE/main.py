@@ -1,5 +1,5 @@
 import imp
-from utils import run_sql_file
+from utils import run_sql_file, query_4, query_1
 import mysql.connector
 
 CONNECTOR = mysql.connector.connect(
@@ -23,21 +23,22 @@ while (True):
     By the next quetions we will help you, by our information, to get the best decision is where to put your money.
     So.... 
     What would you like to know today?
-    1 - I want to know what is the total profit of all the movies X-actor played on.
+    1 - I want to know how comman is the word X in movie titles (FULL TEXT)
     2 - I want to know what is the average profit for X-genere movies.
-    3 - I want to know if there is more woman in X-movie's cast... Is he feminist movie?
-    4 - I want to know what is the average rating that X-actor got for her\his movies.
-    5 - I want to know what is the AVERAGE run time in movies released at X-year.
+    3 - I want to know if there is more females than males in X-movie's cast... Is he feminist movie?
+    4 - Which of two given actors hava the higher average rating... 
+    5 - I want to know what is the AVERAGE run time in movies from the most profitable genrereleased at X-year.
     6 - ITAI QUERIS
-    7 - ITAI QUERIS
+    7 - I want to know who is the most profitable actor that playes in at least X movies of the Y genre.
+
     """
     navigate = input(what_to_ask)
 
     if navigate == '1':
-        pt = input("\nWhich actor?")
+        pt = input("\nWhich word?")
         if pt is None:
             raise ValueError("Must be provided!")
-        run_sql_file(CONNECTOR, "sqls/full_text_1.sql", pt)
+        query_1(CONNECTOR, pt)
         break
     elif navigate == '2':
         pt = input("\nWhich genere?")
@@ -53,11 +54,12 @@ while (True):
             CONNECTOR, "sqls/Is_movie_X_feminist_3.sql", pt)
         break
     elif navigate == '4':
-        pt = input("\nWhich actor?")
-        if pt is None:
+        act1 = input("\nWhich actor1?")
+        act2 = input("\nWhich actor2?")
+        if act1 is None or act2 is None:
             raise ValueError("Must be provided!")
-        run_sql_file(
-            CONNECTOR, "sqls/What_is_the_average_rating_that_X_got_for_his_movies_4.sql", pt)
+        query_4(
+            CONNECTOR, act1, act2)
         break
     elif navigate == '5':
         pt = input("\nWhich year?")
@@ -76,7 +78,7 @@ while (True):
         break
     elif navigate == '7':
         user_genre = input("\nWhich genre?")
-        user_num = input("\nHow many times?")
+        user_num = input("\nHow many movies?")
         if user_genre is None or user_num is None:
             raise ValueError("Must be provided!")
         run_sql_file(

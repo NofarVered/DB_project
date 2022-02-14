@@ -16,6 +16,7 @@ FROM
         GROUP BY id)b
 WHERE  a.title = b.title
 AND a.title = {pt}
+LIMIT 1
 
 
 
