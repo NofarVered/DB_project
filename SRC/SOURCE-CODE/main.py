@@ -1,5 +1,5 @@
 import imp
-from utils import run_sql_file, query_4, query_1
+from utils import run_sql_file, query_4, query_1, query_6, query_2, query_3, query_5, query_7
 import mysql.connector
 
 CONNECTOR = mysql.connector.connect(
@@ -28,7 +28,7 @@ while (True):
     3 - I want to know if there is more females than males in X-movie's cast... Is he feminist movie?
     4 - Which of two given actors hava the higher average rating... 
     5 - I want to know what is the AVERAGE run time in movies from the most profitable genrereleased at X-year.
-    6 - ITAI QUERIS
+    6 - Show the yearly change in profit for a X year for a Y genre
     7 - I want to know who is the most profitable actor that playes in at least X movies of the Y genre.
 
     """
@@ -44,14 +44,14 @@ while (True):
         pt = input("\nWhich genere?")
         if pt is None:
             raise ValueError("Must be provided!")
-        run_sql_file(CONNECTOR, "sqls/avg_genre_X_profit_2.sql", pt)
+        query_2(CONNECTOR, pt)
         break
     elif navigate == '3':
         pt = input("\nWhich movie title?")
         if pt is None:
             raise ValueError("Must be provided!")
-        run_sql_file(
-            CONNECTOR, "sqls/Is_movie_X_feminist_3.sql", pt)
+        query_3(
+            CONNECTOR, pt)
         break
     elif navigate == '4':
         act1 = input("\nWhich actor1?")
@@ -65,24 +65,24 @@ while (True):
         pt = input("\nWhich year?")
         if pt is None:
             raise ValueError("Must be provided!")
-        run_sql_file(
-            CONNECTOR, "sqls/What_is_the_aver_run_time_in_movies_released_at_X_5.sql", pt)
+        query_5(
+            CONNECTOR, pt)
         break
     elif navigate == '6':
         user_year = input("\nWhich year?")
         user_genre = input("\nWhich genre?")
         if user_year is None or user_genre is None:
             raise ValueError("Must be provided!")
-        run_sql_file(
-            CONNECTOR, "sqls/yearly_change_6.sql", user_year, user_genre)
+        query_6(
+            CONNECTOR, user_year, user_genre)
         break
     elif navigate == '7':
         user_genre = input("\nWhich genre?")
         user_num = input("\nHow many movies?")
         if user_genre is None or user_num is None:
             raise ValueError("Must be provided!")
-        run_sql_file(
-            CONNECTOR, "sqls/Actor_genre_X_frequency_7.sql", user_genre, user_num)
+        query_7(
+            CONNECTOR, user_genre, user_num)
         break
 
 
