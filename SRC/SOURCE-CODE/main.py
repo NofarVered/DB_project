@@ -1,5 +1,5 @@
 import imp
-from utils import run_sql_file, query_4, query_1, query_6, query_2, query_3, query_5, query_7
+from utils import query_4, query_1, query_6, query_2, query_3, query_5, query_7
 import mysql.connector
 
 CONNECTOR = mysql.connector.connect(
