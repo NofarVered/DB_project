@@ -1,5 +1,5 @@
 SELECT
-    CONCAT("What is the average profit of {pt} (genre) movies ?") as question,
+    CONCAT("What is the average profit of {pt} movies ?") as question,
     a.avg_profit as answer
 FROM
     (SELECT 
@@ -8,9 +8,8 @@ FROM
         INNER JOIN
     Movie_genres ON Movies.imdb_id = Movie_genres.movie_id
         INNER JOIN
-    Genres ON genres.id = Movie_genres.genre_id
+    Genres ON Genres.id = Movie_genres.genre_id
     GROUP BY Genres.name) AS a
 WHERE
-	Genres.name = {pt}
+	a.name = {pt}
 LIMIT 1
-

@@ -46,11 +46,11 @@ while (True):
         run_sql_file(CONNECTOR, "sqls/avg_genre_X_profit_2.sql", pt)
         break
     elif navigate == '3':
-        pt = input("\nWhich gender?")
+        pt = input("\nWhich movie title?")
         if pt is None:
             raise ValueError("Must be provided!")
         run_sql_file(
-            CONNECTOR, "sqls/How_many_X_actors_played_in_the_top_ten_movie_by_profit_3.sql", pt)
+            CONNECTOR, "sqls/For_given_movie_is_he_has_more_F.M_actors_3.sql", pt)
         break
     elif navigate == '4':
         pt = input("\nWhich actor?")
