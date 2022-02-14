@@ -1,5 +1,4 @@
-import imp
-from utils import query_4, query_1, query_6, query_2, query_3, query_5, query_7
+import utils
 import mysql.connector
 
 CONNECTOR = mysql.connector.connect(
@@ -9,12 +8,12 @@ CONNECTOR = mysql.connector.connect(
     password='DbMysql36',
     database='DbMysql36'
 )
-print(CONNECTOR)
-mycursor = CONNECTOR.cursor()
-mycursor.execute("SHOW TABLES")
-for tb in mycursor:
-    print(tb)
-mycursor.close()
+# print(CONNECTOR)
+# mycursor = CONNECTOR.cursor()
+# mycursor.execute("SHOW TABLES")
+# for tb in mycursor:
+#     print(tb)
+# mycursor.close()
 
 while (True):
     what_to_ask = """
@@ -38,19 +37,19 @@ while (True):
         pt = input("\nWhich word?")
         if pt is None:
             raise ValueError("Must be provided!")
-        query_1(CONNECTOR, pt)
+        utils.query_1(CONNECTOR, pt)
         break
     elif navigate == '2':
         pt = input("\nWhich genere?")
         if pt is None:
             raise ValueError("Must be provided!")
-        query_2(CONNECTOR, pt)
+        utils.query_2(CONNECTOR, pt)
         break
     elif navigate == '3':
         pt = input("\nWhich movie title?")
         if pt is None:
             raise ValueError("Must be provided!")
-        query_3(
+        utils.query_3(
             CONNECTOR, pt)
         break
     elif navigate == '4':
@@ -58,14 +57,14 @@ while (True):
         act2 = input("\nWhich actor2?")
         if act1 is None or act2 is None:
             raise ValueError("Must be provided!")
-        query_4(
+        utils.query_4(
             CONNECTOR, act1, act2)
         break
     elif navigate == '5':
         pt = input("\nWhich year?")
         if pt is None:
             raise ValueError("Must be provided!")
-        query_5(
+        utils.query_5(
             CONNECTOR, pt)
         break
     elif navigate == '6':
@@ -73,7 +72,7 @@ while (True):
         user_genre = input("\nWhich genre?")
         if user_year is None or user_genre is None:
             raise ValueError("Must be provided!")
-        query_6(
+        utils.query_6(
             CONNECTOR, user_year, user_genre)
         break
     elif navigate == '7':
@@ -81,7 +80,7 @@ while (True):
         user_num = input("\nHow many movies?")
         if user_genre is None or user_num is None:
             raise ValueError("Must be provided!")
-        query_7(
+        utils.query_7(
             CONNECTOR, user_genre, user_num)
         break
 
