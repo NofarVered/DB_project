@@ -25,7 +25,7 @@ while (True):
     What would you like to know today?
     1 - I want to know what is the total profit of all the movies X-actor played on.
     2 - I want to know what is the average profit for X-genere movies.
-    3 - I want to know how many actors from X-gender, played in the top ten leading movie by profit.
+    3 - I want to know if there is more woman in X-movie's cast... Is he feminist movie?
     4 - I want to know what is the average rating that X-actor got for her\his movies.
     5 - I want to know what is the AVERAGE run time in movies released at X-year.
     6 - ITAI QUERIS
@@ -50,7 +50,7 @@ while (True):
         if pt is None:
             raise ValueError("Must be provided!")
         run_sql_file(
-            CONNECTOR, "sqls/For_given_movie_is_he_has_more_F.M_actors_3.sql", pt)
+            CONNECTOR, "sqls/Is_movie_X_feminist_3.sql", pt)
         break
     elif navigate == '4':
         pt = input("\nWhich actor?")
