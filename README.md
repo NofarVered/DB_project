@@ -1,1 +1,2 @@
-# DBS_course_project
+# DB_project
+All the queries are saved in the utils.py file

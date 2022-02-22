@@ -2,19 +2,20 @@ import mysql.connector
 
 
 def query_1(CONNECTOR, input):
-    query = """SELECT Movies.title
+    query = """SELECT m.title
     FROM
     Movies AS m
     WHERE
-	  MATCH(Movies.title) AGAINST( %s IN BOOLEAN MODE) """
+	  MATCH(m.title) AGAINST( %s IN BOOLEAN MODE) """
     mycursor = CONNECTOR.cursor()
     mycursor.execute(query, [input])
     result_len = len(mycursor.fetchall())
-    query2 = """"SELECT * FROM Movies"""
-    mycursor.execute(query2)
+    
+    mycursor.execute("SELECT * FROM Movies")
     total_len = len(mycursor.fetchall())
+    
     mycursor.close()
-    print(result_len/total_len*100)
+    print("The movies that have ",input, "in their title make ", result_len/total_len*100, "% of the entire movies")
 
 
 def query_4(CONNECTOR, act1, act2):
@@ -52,16 +53,20 @@ def query_6(CONNECTOR, year, genre):
                 y.revenues AS past_year_revenue
                 FROM  Genres, Genre_Yearly_Revenues x, Genre_Yearly_Revenues y
                 WHERE x.Year= %s
-                AND y.Year = (CAST(%s AS INTEGER) - 1)
-                AND Genres.name= 'Action'
+                AND y.Year = (CONVERT(%s, SIGNED INTEGER) - 1)
+                AND Genres.name= %s
                 AND x.name= %s
                 AND y.name= %s
                 AND y.revenues IS NOT NULL
         ) AS Q """
     mycursor = CONNECTOR.cursor()
-    mycursor.execute(query, [year, year, genre, genre])
+    mycursor.execute(query, [year, year, genre, genre, genre])
     result = mycursor.fetchall()
     print(result)
+    if (result[0][2]<0):
+        print(year, "was a bad year for the ", genre, "movies")
+    else:
+        print(year, "was a good year for the ", genre, "movies")
     mycursor.close()
 
 
@@ -83,7 +88,7 @@ def query_2(CONNECTOR, pt):
     mycursor = CONNECTOR.cursor()
     mycursor.execute(query, [pt])
     result = mycursor.fetchall()
-    print(result)
+    print("the average profit is", result[0][0], "USD dollars")
     mycursor.close()
 
 
@@ -111,6 +116,10 @@ def query_3(CONNECTOR, pt):
     mycursor.execute(query, [pt])
     result = mycursor.fetchall()
     print(result)
+    if (result[0][3] == "False"):
+        print("Unfortantlly, there is more males actors in the cast! they have only", result[0][1],"female actors")
+    else:
+         print("It is a feminist cast!", result[0][1],"female actors")
     mycursor.close()
 
 
@@ -132,7 +141,7 @@ def query_5(CONNECTOR, pt):
     mycursor = CONNECTOR.cursor()
     mycursor.execute(query, [pt, pt, pt])
     result = mycursor.fetchall()
-    print(result)
+    print(result[0][0])
     mycursor.close()
 
 
@@ -147,11 +156,12 @@ def query_7(CONNECTOR, user_genre, user_num):
                     AND Genres.id=Movie_genres.genre_id
                     AND Genres.name = %s
                 GROUP BY Actors.name
-                HAVING COUNT(DISTINCT Movies.imdb_id) >= CAST(%s AS INTEGER)) AS Q
+                HAVING COUNT(DISTINCT Movies.imdb_id) >= CONVERT(%s, SIGNED INTEGER)) AS Q
                 ORDER BY Q.total_profit DESC
                 LIMIT 1 """
     mycursor = CONNECTOR.cursor()
     mycursor.execute(query, [user_genre, user_num])
     result = mycursor.fetchall()
     print(result)
+    print(result[0][0], "is the most profitable actor" )
     mycursor.close()
